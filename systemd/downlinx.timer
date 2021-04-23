@@ -1,0 +1,11 @@
+[Unit]
+Description=Run Downlinx upon login and on a schedule
+
+[Timer]
+# Run one second after login.
+OnActiveSec=1sec
+# Run every 20 minutes.
+OnUnitActiveSec=20min
+
+[Install]
+WantedBy=timers.target

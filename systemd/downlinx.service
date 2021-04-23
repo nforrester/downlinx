@@ -1,0 +1,10 @@
+[Unit]
+Description=Downlinx (desktop backgrounds from live satellites)
+After=network.target
+
+[Service]
+Type=oneshot
+ExecStart=nice /home/neil/downlinx/downlinx.py /home/neil/downlinx/pipelines/mix_satellite_images_with_local
+
+[Install]
+WantedBy=default.target
