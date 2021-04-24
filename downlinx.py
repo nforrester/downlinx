@@ -25,7 +25,7 @@ def _quote_if_has_whitespace(string: str):
         return string
     return "'{}'".format(string.replace("'", "\\'"))
 
-def _check_call_with_echo(cmd: list[str], *args, **kwargs):
+def _check_call_with_echo(cmd: typing.List[str], *args, **kwargs):
     """Like subprocess.check_call(), but it echos the command."""
     print(*map(_quote_if_has_whitespace, cmd))
     subprocess.check_call(cmd, *args, **kwargs)
