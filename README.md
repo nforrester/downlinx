@@ -133,7 +133,7 @@ You can see the status of your timers like this:
 ### Image acquisition and processing
 
     class Image(object):
-        def __init__(self, filepath: str):
+        def __init__(self, filepath: str) -> None:
             self.filepath
             self.size
 
@@ -141,39 +141,39 @@ An `Image` stores the size of an image (in pixels) and its location in the files
 The size is determined automatically, so you only need to specify the path when constructing one.
     
     class Pipeline(object):
-        def __init__(self, pipeline_dir: str):
+        def __init__(self, pipeline_dir: str) -> None:
 
 An image processing `Pipeline` that lets you operate on a series of related images.
 `pipeline_dir` contains the `run.py` file and a subdirectory will be created to store images.
 
-        def blank(self, color: str, size: Size):
+        def blank(self, color: str, size: Size) -> Image:
 
 Make a new blank image of the specified color (described using a string) and `Size`.
 
-        def crop(self, image: Image, offset: Pos, size: Size):
+        def crop(self, image: Image, offset: Pos, size: Size) -> Image:
 
 Crop an image down to a region specified by `offset` (a `Pos`) and `size` (a `Size`).
 
-        def place(self, new: Image, offset: Pos, base: Image):
+        def place(self, new: Image, offset: Pos, base: Image) -> Image:
 
 Place a `new` image on top of a `base` image at a particular `offset`.
 
-        def resize(self, image: Image, size: Size):
+        def resize(self, image: Image, size: Size) -> Image:
 
 Resize an image to the specified `Size`.
 
-        def to_jpg(self, image: Image):
+        def to_jpg(self, image: Image) -> Image:
 
 Make a `.jpg` image. Most functions return `.png` for lossless composition,
 but `set_background_wm_only()` needs a `.jpg` to render colors accurately,
 so this lets you do that final conversion step.
     
     class Downlinx(Pipeline):
-        def __init__(self, pipeline_dir: str):
+        def __init__(self, pipeline_dir: str) -> None:
 
 Subclass of `Pipeline` that provides specialized functions for interacting with satellite images.
 
-        def get(self, source_name: str, size: str):
+        def get(self, source_name: str, size: str) -> Image:
 
 Download a live image from an actual weather satellite!
 The URL to download is looked up in `sources.json` by the `'name'` and `'url'` keys.
@@ -188,9 +188,9 @@ minimum refresh interval.
 but I stored it here just in case something happens to the original.
 Also I changed the Himawari-8 URLs to use https because I got a redirect page when I tried the originals.
 
-        def clean_goes_east_large(self):
-        def clean_goes_west_large(self):
-        def clean_himawari8_large(self):
+        def clean_goes_east_large(self) -> Image:
+        def clean_goes_west_large(self) -> Image:
+        def clean_himawari8_large(self) -> Image:
 
 Images directly from most sources include logos, information bars, or other less than beautiful elements.
 These functions return nice clean images of the entire Earth from different satellites.
@@ -210,7 +210,7 @@ Represents a position in an image, measured in pixels.
 
 Represents the size of an image or region, measured in pixels.
 
-    def scale_to_width(orig, width):
+    def scale_to_width(orig: Size, width: int) -> Size:
 
 Scale a `Size` to a new `width`, preserving the aspect ratio.
 
@@ -218,19 +218,19 @@ Scale a `Size` to a new `width`, preserving the aspect ratio.
 
 Scale a `Size` to a new `height`, preserving the aspect ratio.
 
-    def scale_to_fit(orig, bounding_box):
+    def scale_to_height(orig: Size, height: int) -> Size:
 
 Scale a `Size` so it will fit completely inside another `Size`, preserving the aspect ratio.
 
-    def add_pos(pos1, pos2):
+    def add_pos(pos1: Pos, pos2: Pos) -> Pos:
 
 Vector addition on `Pos` objects (`Pos(pos1.x+pos2.x, pos1.y+pos2.y)`).
 
-    def aspect_ratio(size):
+    def aspect_ratio(size: Size) -> float:
 
 Return the aspect ratio of a `Size` as a float (`w/h`).
 
-    def centering_offset(image_size, frame_size, frame_offset=Pos(0, 0)):
+    def centering_offset(image_size: Size, frame_size: Size, frame_offset: Pos = Pos(0, 0)) -> Pos:
 
 Return an offset which, if passed to `Pipeline.place()`,
 will center an image of the given size in a frame of the given size and position.
@@ -241,21 +241,21 @@ using the image size as `frame_size` and the crop region size as `image_size`.
 
 Set an image as the desktop background.
 
-    def set_background_wm_only(image):
+    def set_background_wm_only(image: Image) -> None:
 
 Use this if you're using a Window Manager (like XMonad or Openbox) but no Desktop Environment.
 It draws the image directly on the X root. Use a `.jpg`, not a `.png`, to get accurate color rendering.
 See `Pipeline.to_jpg()` to do this conversion.
 
-    def set_background_gnome2(image):
+    def set_background_gnome2(image: Image) -> None:
 
 Use this if you're using GNOME 2. Note that it hasn't been tested - good luck!
 
-    def set_background_gnome3(image):
+    def set_background_gnome3(image: Image) -> None:
 
 Use this if you're using GNOME 3 or Unity. Note that it hasn't been tested - good luck!
 
-    def set_background_xfce(monitor, image):
+    def set_background_xfce(monitor: str, image: Image) -> None:
 
 Use this if you're using Xfce.
 It only operates on one monitor at a time, specified by a string such as `'screen0/monitor0'`,
@@ -265,7 +265,7 @@ Note that it hasn't been tested - good luck!
 
 ### Debugging
 
-    def eog(image):
+    def eog(image: Image) -> None:
 
 Open an image in the `eog` (Eye of GNOME) image viewer. This is useful for debugging your image processing pipeline.
 This function will block until you close `eog`.
