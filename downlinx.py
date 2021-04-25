@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 
 import datetime
+from distutils.spawn import find_executable
 import importlib.util
 import json
 import os
@@ -9,7 +10,24 @@ import re
 import shutil
 import subprocess
 import sys
-import typing
+from typing import List, NamedTuple, Optional
+
+
+def _is_legacy_imagemagick() -> Optional[bool]:
+    """Check if legacy imagemagick installed
+
+    Returns True if legacy, False if new version and None if neither
+    """
+
+    magick = bool(find_executable("magick"))
+    convert = bool(find_executable("convert"))
+    if magick:
+        return False
+    elif convert:
+        return True
+    return None
+
+LEGACY_IMAGE_MAGICK = _is_legacy_imagemagick()
 
 def _has_whitespace(string: str):
     """Return True if a string has whitespace."""
@@ -25,7 +43,7 @@ def _quote_if_has_whitespace(string: str):
         return string
     return "'{}'".format(string.replace("'", "\\'"))
 
-def _check_call_with_echo(cmd: typing.List[str], *args, **kwargs):
+def _check_call_with_echo(cmd: List[str], *args, **kwargs):
     """Like subprocess.check_call(), but it echos the command."""
     print(*map(_quote_if_has_whitespace, cmd))
     subprocess.check_call(cmd, *args, **kwargs)
@@ -44,18 +62,25 @@ def _ensure_directory_exists(filepath: str):
 
 def magick(*args):
     """Invoke ImageMagick with the specified arguments."""
-    _check_call_with_echo(['magick'] + list(args))
+    cmdline = list(args)
+    
+    if LEGACY_IMAGE_MAGICK is False:
+        cmdline.insert(0, 'magick')
+    elif args[0] != 'convert':
+        cmdline.insert(0, 'convert')
+
+    _check_call_with_echo(cmdline)
 
 MAGICK_PNG_COLOR = ['-define', 'png:color-type=6']
 """This needs to always come before the output image name in any ImageMagick command
 producing a PNG in order to ensure that the output image has the correct colorspace."""
 
-class Pos(typing.NamedTuple):
+class Pos(NamedTuple):
     """A position, in pixels, with (0, 0) at the top left, x increasing to the right, and y increasing down."""
     x: int
     y: int
 
-class Size(typing.NamedTuple):
+class Size(NamedTuple):
     """A size, in pixels."""
     w: int
     h: int
@@ -97,7 +122,10 @@ class Image(object):
 
     def __init__(self, filepath: str):
         self.filepath = filepath
-        output = subprocess.check_output(['magick', 'identify', '-ping', '-format', '%w %h', filepath])
+        cmdline = ['identify', '-ping', '-format', '%w %h', filepath]
+        if LEGACY_IMAGE_MAGICK is False:
+            cmdline.insert(0, 'magick')
+        output = subprocess.check_output(cmdline)
         self.size = Size(*map(int, output.split(b' ')))
 
 class Pipeline(object):
@@ -276,6 +304,9 @@ def eog(image: Image):
 
 def main():
     """Run run.py in the directory specified on the command line."""
+    if LEGACY_IMAGE_MAGICK is None:
+        print('ImageMagick was not found. Please install!')
+        sys.exit(1)
     if len(sys.argv) != 2 or not os.path.isfile(os.path.join(sys.argv[1], 'run.py')):
         print('downlinx.py takes one command line argument: the pipeline directory (containing run.py).')
         print('For example:')
