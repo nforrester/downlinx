@@ -291,12 +291,12 @@ def set_background_gnome3(image: Image) -> None:
 
 # NOTE: set_background_xfce() has not been tested. It might not work! Consider submitting a PR if you figure it out.
 def set_background_xfce(monitor: str, image: Image) -> None:
-    """Put an Image up on the desktop background on the specified monitor (for example, 'screen0/monitor0').
-    Supposedly, valid monitor identifiers can be listed with 'xfconf-query --channel xfce4-desktop --list'.
+    """Put an Image up on the desktop background on the specified monitor and workspace (for example, 'screen0/monitorHDMI-0/workspace0').
+    Valid monitor identifiers can be listed with 'xfconf-query --channel xfce4-desktop --list'.
     Unlike the other background setting functions, this one work on only one monitor at a time,
     so you will need to compose multiple images (or produce multiple crops).
     This function is for people using Xfce."""
-    _check_call_with_echo(['xfconf-query', '--channel', 'xfce4-desktop', '--property', '/backdrop/' + monitor + '/image-path', '--set', os.path.abspath(image.filepath)])
+    _check_call_with_echo(['xfconf-query', '--channel', 'xfce4-desktop', '--property', '/backdrop/' + monitor + '/last-image', '--set', os.path.abspath(image.filepath)])
 
 def eog(image: Image) -> None:
     """Open an Image in the EOG image viewer. Useful for debugging. This call will block until EOG exits."""
