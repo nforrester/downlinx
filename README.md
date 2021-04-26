@@ -260,8 +260,7 @@ Use this if you're using GNOME 3 or Unity. Note that it hasn't been tested - goo
 Use this if you're using Xfce.
 It only operates on one monitor at a time, specified by a string such as `'screen0/monitor0'`,
 so you'll need to compose several backgrounds if you have multiple monitors, or crop a single image into several pieces.
-Supposedly, valid monitor identifiers can be listed with `xfconf-query --channel xfce4-desktop --list`.
-Note that it hasn't been tested - good luck!
+Valid monitor identifiers can be listed with `xfconf-query --channel xfce4-desktop --list`.
 
 ### Debugging
 

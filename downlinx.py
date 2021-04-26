@@ -289,7 +289,6 @@ def set_background_gnome3(image: Image) -> None:
     _check_call_with_echo(['gsettings', 'set', 'org.gnome.desktop.background', 'picture-uri', 'file://' + os.path.abspath(image.filepath)])
     _check_call_with_echo(['gsettings', 'set', 'org.gnome.desktop.background', 'picture-options', 'spanned'])
 
-# NOTE: set_background_xfce() has not been tested. It might not work! Consider submitting a PR if you figure it out.
 def set_background_xfce(monitor: str, image: Image) -> None:
     """Put an Image up on the desktop background on the specified monitor and workspace (for example, 'screen0/monitorHDMI-0/workspace0').
     Valid monitor identifiers can be listed with 'xfconf-query --channel xfce4-desktop --list'.
